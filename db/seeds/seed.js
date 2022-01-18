@@ -39,11 +39,11 @@ const seed = (data) => {
       return db.query(`
       CREATE TABLE articles(
         article_id SERIAL PRIMARY KEY,
-        title TEXT,
-        body TEXT,
+        title TEXT NOT NULL,
+        body TEXT NOT NULL,
         votes INT DEFAULT 0,
         topic VARCHAR(255) REFERENCES topics(slug),
-        author VARCHAR(255) REFERENCES users(username),
+        author VARCHAR(255) REFERENCES users(username) NOT NULL,
         created_at DATE NOT NULL DEFAULT CURRENT_TIMESTAMP
       )
       ;`);
@@ -52,7 +52,7 @@ const seed = (data) => {
       return db.query(`
     CREATE TABLE comments(
       comment_id SERIAL PRIMARY KEY,
-      author VARCHAR(255) REFERENCES  users(username),
+      author VARCHAR(255) REFERENCES users(username),
       article_id INT REFERENCES articles(article_id),
       votes INT DEFAULT 0,
       created_at DATE NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -68,11 +68,6 @@ const seed = (data) => {
         formattedTopics
       );
       return db.query(sql);
-    })
-    .then((results) => {
-      // topics reference
-      const topicsRef = results.rows;
-      return topicsRef;
     })
     .then(() => {
       //seeding users
