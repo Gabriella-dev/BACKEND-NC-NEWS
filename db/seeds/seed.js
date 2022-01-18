@@ -3,7 +3,10 @@ const format = require("pg-format");
 const {
   formatTopicsData,
   formatUserData,
+  formatArticlesDate,
+  formatCommentData,
 } = require("/Users/gabriella/dev/northcoders/backend/be-nc-news/utils/seeds-formatting.js");
+const { user } = require("pg/lib/defaults");
 const seed = (data) => {
   const { articleData, commentData, topicData, userData } = data;
   return db
@@ -16,7 +19,6 @@ const seed = (data) => {
       });
     })
     .then(() => {
-      //console.log("table dropted");
       return db.query(`
     CREATE TABLE topics(
       slug VARCHAR(255) PRIMARY KEY,
@@ -25,7 +27,6 @@ const seed = (data) => {
     ;`);
     })
     .then(() => {
-      //console.log("table dropted");
       return db.query(`
     CREATE TABLE users(
       username VARCHAR(255) PRIMARY KEY,
@@ -35,7 +36,6 @@ const seed = (data) => {
     ;`);
     })
     .then(() => {
-      //console.log("users table");
       return db.query(`
       CREATE TABLE articles(
         article_id SERIAL PRIMARY KEY,
@@ -49,7 +49,6 @@ const seed = (data) => {
       ;`);
     })
     .then(() => {
-      //  console.log("comments table");
       return db.query(`
     CREATE TABLE comments(
       comment_id SERIAL PRIMARY KEY,
@@ -61,13 +60,9 @@ const seed = (data) => {
     )
     ;`);
     })
-
     .then(() => {
-      // console.log(`all tables created`);
-    })
-    .then(() => {
+      // seeding topics
       const formattedTopics = formatTopicsData(topicData);
-      //console.log("formsatted Topics>>>>", formattedTopics);
       const sql = format(
         `INSERT INTO topics (slug, description) VALUES %L RETURNING *;`,
         formattedTopics
@@ -75,11 +70,12 @@ const seed = (data) => {
       return db.query(sql);
     })
     .then((results) => {
-      console.log("results.rows formatted topics>>>>", results.rows);
+      // topics reference
       const topicsRef = results.rows;
       return topicsRef;
     })
     .then(() => {
+      //seeding users
       const formattedUsers = formatUserData(userData);
       const sql = format(
         `INSERT INTO users (username, name,avatar_url) VALUES %L RETURNING *;`,
@@ -88,10 +84,30 @@ const seed = (data) => {
       return db.query(sql);
     })
     .then((results) => {
-      console.log("results.rows formatted users>>>>", results.rows);
-      const userRef = results.rows;
-      return userRef;
+      // users reference
+      const usersRef = results.rows;
+      return usersRef;
+    })
+    .then(() => {
+      //seeding articles
+      const formatArticle = formatArticlesDate(articleData);
+      const sql = format(
+        `INSERT INTO articles (title, body, votes, topic, author,created_at) VALUES %L RETURNING *;`,
+        formatArticle
+      );
+      return db.query(sql);
+    })
+    .then(() => {
+      //seeding comments
+      const formatComment = formatCommentData(commentData);
+      const sql = format(
+        `INSERT INTO comments (body, votes, author, article_id, created_at) VALUES %L RETURNING *;`,
+        formatComment
+      );
+      return db.query(sql);
     });
+  // .then((results) => {
+  //   console.log(results.rows);
+  // });
 };
-
 module.exports = seed;
