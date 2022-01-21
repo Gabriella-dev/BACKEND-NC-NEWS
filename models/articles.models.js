@@ -25,16 +25,33 @@ exports.updateArticleById = (inc_votes, article_id) => {
       return result.rows[0];
     });
 };
-exports.selectArticles = () => {
-  const artIdQuery = `
-  SELECT articles.*, 
-  COUNT(comments.article_id) AS comment_count
-  FROM comments
-  INNER JOIN articles ON comments.article_id = articles.article_id
-  GROUP BY articles.article_id
-  ORDER BY articles.created_at ASC`;
+exports.selectArticles = (topic, sort_by, order_by) => {
+  let queryArgs = [];
+  let artIdQuery = `
+    SELECT articles.*, 
+    COUNT(comments.article_id) AS comment_count
+    FROM comments
+    INNER JOIN articles ON comments.article_id = articles.article_id
+  `;
 
-  return db.query(artIdQuery).then((result) => {
+  if (topic) {
+    artIdQuery += ` WHERE articles.topic = $1`;
+    queryArgs.push(topic);
+  }
+
+  if (!sort_by) {
+    sort_by = "created_at";
+  }
+
+  if (!order_by) {
+    order_by = "DESC";
+  }
+
+  artIdQuery += ` GROUP BY articles.article_id
+  ORDER BY articles.${sort_by} ${order_by};
+  `;
+
+  return db.query(artIdQuery, queryArgs).then((result) => {
     return result.rows;
   });
 };

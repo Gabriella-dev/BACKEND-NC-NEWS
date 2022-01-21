@@ -1,3 +1,4 @@
+const { sort } = require("../db/data/test-data/articles");
 const {
   selectArticleById,
   updateArticleById,
@@ -37,7 +38,11 @@ exports.patchArticleById = (req, res, next) => {
     });
 };
 exports.getArticles = (req, res, next) => {
-  selectArticles()
+  const { topic } = req.query;
+  const { sort_by } = req.query;
+  const { order_by } = req.query;
+
+  selectArticles(topic, sort_by, order_by)
     .then((articles) => {
       res.status(200).send({ articles });
     })

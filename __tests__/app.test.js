@@ -111,7 +111,7 @@ describe("PATCH /api/articles/:article_id", () => {
   });
 });
 
-describe("GET /api/articles", () => {
+describe("GET /api/articles/", () => {
   test("status:200, responds with array of article objects", () => {
     return request(app)
       .get(`/api/articles`)
@@ -131,6 +131,117 @@ describe("GET /api/articles", () => {
             comment_count: expect.any(String),
           });
         });
+      });
+  });
+
+  test("status:200, responds with array of article objects with the topic 'cats'", () => {
+    const topic = "cats";
+    return request(app)
+      .get(`/api/articles/`)
+      .query({
+        topic: topic,
+      })
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeInstanceOf(Array);
+        expect(body.articles).toHaveLength(1);
+        body.articles.forEach((article) => {
+          expect(article).toMatchObject({
+            article_id: expect.any(Number),
+            title: expect.any(String),
+            body: expect.any(String),
+            votes: expect.any(Number),
+            topic: expect.any(String),
+            author: expect.any(String),
+            created_at: expect.any(String),
+            comment_count: expect.any(String),
+          });
+        });
+      });
+  });
+
+  test("status:200, responds with array of article objects with sort_by and order_by defaults", () => {
+    return request(app)
+      .get(`/api/articles/`)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeInstanceOf(Array);
+        expect(body.articles).toHaveLength(5);
+        expect(body.articles[0].created_at).toBe("2020-11-03T00:00:00.000Z");
+      });
+  });
+
+  test("status:200, responds with array of article objects with sort_by default and order_by non default", () => {
+    const order_by = "ASC";
+    return request(app)
+      .get(`/api/articles/`)
+      .query({
+        order_by: order_by,
+      })
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeInstanceOf(Array);
+        expect(body.articles).toHaveLength(5);
+        expect(body.articles[0].created_at).toBe("2020-06-05T23:00:00.000Z");
+      });
+  });
+
+  test("status:200, responds with array of article objects with sort_by non default and order_by default", () => {
+    const sort_by = "title";
+    return request(app)
+      .get(`/api/articles/`)
+      .query({
+        sort_by: sort_by,
+      })
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeInstanceOf(Array);
+        expect(body.articles).toHaveLength(5);
+        expect(body.articles[0].title).toBe(
+          "UNCOVERED: catspiracy to bring down democracy"
+        );
+      });
+  });
+
+  test("status:200, responds with array of article objects with sort_by non default and order_by non default", () => {
+    const sort_by = "title";
+    const order_by = "ASC";
+    return request(app)
+      .get(`/api/articles/`)
+      .query({
+        sort_by: sort_by,
+        order_by: order_by,
+      })
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeInstanceOf(Array);
+        expect(body.articles).toHaveLength(5);
+        expect(body.articles[0].title).toBe("A");
+        expect(body.articles[1].title).toBe(
+          "Eight pug gifs that remind me of mitch"
+        );
+      });
+  });
+
+  test("status:200, responds with array of article objects with topic and sort_by non default and order_by non default", () => {
+    const topic = "mitch";
+    const sort_by = "title";
+    const order_by = "ASC";
+    return request(app)
+      .get(`/api/articles/`)
+      .query({
+        sort_by: sort_by,
+        order_by: order_by,
+        topic: topic,
+      })
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.articles).toBeInstanceOf(Array);
+        expect(body.articles).toHaveLength(4);
+        expect(body.articles[0].title).toBe("A");
+        expect(body.articles[1].title).toBe(
+          "Eight pug gifs that remind me of mitch"
+        );
       });
   });
 });
