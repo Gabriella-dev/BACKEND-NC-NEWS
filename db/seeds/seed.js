@@ -101,8 +101,5 @@ const seed = (data) => {
       );
       return db.query(sql);
     });
-  // .then((results) => {
-  //   console.log(results.rows);
-  // });
 };
 module.exports = seed;
