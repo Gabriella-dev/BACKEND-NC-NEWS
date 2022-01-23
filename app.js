@@ -5,7 +5,10 @@ const {
   getArticleById,
   patchArticleById,
   getArticles,
+  getArticleComments,
+  postComment,
 } = require("./controllers/articles.controller");
+const { deleteCommentsById } = require("./controllers/comments.controllers");
 const {
   psqlErroes,
   customErrors,
@@ -14,23 +17,17 @@ const {
 } = require("./errors/errors");
 
 app.use(express.json());
-// GET /api/topics
+
 app.get("/api/topics", getTopics);
 
-// GET /api/articles/:article_id
 app.get("/api/articles/:article_id", getArticleById);
-// PATCH /api/articles/:article_id
 app.patch("/api/articles/:article_id", patchArticleById);
-// GET /api/articles
 app.get("/api/articles", getArticles);
-// GET /api/articles/:article_id/comments
-// POST /api/articles/:article_id/comments
-// DELETE /api/comments/:comment_id
-// GET /api
+app.get("/api/articles/:article_id/comments", getArticleComments);
+app.post("/api/articles/:article_id/comments", postComment);
 
-// GET /api/users
-// GET /api/users/:username
-// PATCH /api/comments/:comment_id
+app.delete("/api/comments/:comment_id", deleteCommentsById);
+
 app.all("*", handle404s);
 app.use(psqlErroes);
 app.use(customErrors);

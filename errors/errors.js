@@ -3,7 +3,7 @@ exports.handle404s = (req, res) => {
 };
 
 exports.psqlErroes = (err, req, res, next) => {
-  if (err.code === "22P02") {
+  if (err.code === "22P02" || err.code === "42703" || err.code === "42601") {
     res.status(400).send({ msg: "Bad request" });
   } else {
     next(err);

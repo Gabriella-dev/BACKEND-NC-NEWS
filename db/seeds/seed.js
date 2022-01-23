@@ -31,7 +31,7 @@ const seed = (data) => {
     CREATE TABLE users(
       username VARCHAR(255) PRIMARY KEY,
       name VARCHAR(255) NOT NULL,
-      avatar_url TEXT
+      avatar_url TEXT NOT NULL
     )
     ;`);
     })
@@ -41,8 +41,8 @@ const seed = (data) => {
         article_id SERIAL PRIMARY KEY,
         title TEXT NOT NULL,
         body TEXT NOT NULL,
-        votes INT DEFAULT 0,
-        topic VARCHAR(255) REFERENCES topics(slug),
+        votes INT DEFAULT 0 NOT NULL,
+        topic VARCHAR(255) REFERENCES topics(slug) NOT NULL,
         author VARCHAR(255) REFERENCES users(username) NOT NULL,
         created_at DATE NOT NULL DEFAULT CURRENT_TIMESTAMP
       )
@@ -52,11 +52,11 @@ const seed = (data) => {
       return db.query(`
     CREATE TABLE comments(
       comment_id SERIAL PRIMARY KEY,
-      author VARCHAR(255) REFERENCES users(username),
-      article_id INT REFERENCES articles(article_id),
-      votes INT DEFAULT 0,
+      author VARCHAR(255) REFERENCES users(username) NOT NULL,
+      article_id INT REFERENCES articles(article_id) NOT NULL,
+      votes INT DEFAULT 0 NOT NULL,
       created_at DATE NOT NULL DEFAULT CURRENT_TIMESTAMP,
-      body TEXT
+      body TEXT NOT NULL
     )
     ;`);
     })

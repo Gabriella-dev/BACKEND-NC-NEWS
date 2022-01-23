@@ -35,6 +35,7 @@ describe("GET /api/topics", () => {
       });
   });
 });
+
 describe("GET /api/articles/:article_id", () => {
   test("status:200, responds with a single matching article object", () => {
     const article_id = 3;
@@ -103,6 +104,58 @@ describe("PATCH /api/articles/:article_id", () => {
           title: "Living in the shadow of a great man",
           body: "I find this existence challenging",
           votes: 108,
+          topic: "mitch",
+          author: "butter_bridge",
+          created_at: "2020-07-08T23:00:00.000Z",
+        });
+      });
+  });
+  test("QUERY: article_id; invalid id. status 400 and returns an error message", () => {
+    const article_id = "invalid_url";
+    const newVotes = 8;
+    return request(app)
+      .patch(`/api/articles/${article_id}`)
+      .send({ inc_votes: newVotes })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+  test("QUERY: article_id; not existing. status 404 and returns an error message", () => {
+    const article_id = 10000;
+    const newVotes = 8;
+    return request(app)
+      .patch(`/api/articles/${article_id}`)
+      .send({ inc_votes: newVotes })
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not found");
+      });
+  });
+  test("Status 400, invalid inc_votes type", () => {
+    const article_id = 7;
+    const newVotes = "for";
+    return request(app)
+      .patch(`/api/articles/${article_id}`)
+      .send({ inc_votes: newVotes })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+  test("Status 200, missing `inc_votes` key. No effect to article.", () => {
+    const article_id = 1;
+    const newVotes = 0;
+    return request(app)
+      .patch(`/api/articles/${article_id}`)
+      .send({ inc_votes: newVotes })
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.article).toEqual({
+          article_id: 1,
+          title: "Living in the shadow of a great man",
+          body: "I find this existence challenging",
+          votes: 100,
           topic: "mitch",
           author: "butter_bridge",
           created_at: "2020-07-08T23:00:00.000Z",
@@ -243,5 +296,101 @@ describe("GET /api/articles/", () => {
           "Eight pug gifs that remind me of mitch"
         );
       });
+  });
+
+  test("Status 400. invalid `order` query", () => {
+    const order_by = "bananas";
+    return request(app)
+      .get(`/api/articles/`)
+      .query({
+        order_by: order_by,
+      })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+  test("Status 400. invalid `sort_by` query`", () => {
+    const sort_by = "bananas";
+    return request(app)
+      .get(`/api/articles/`)
+      .query({
+        sort_by: sort_by,
+      })
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+});
+describe("GET /api/articles/:article_id/comments", () => {
+  test("status:200, responds with an array of comments for the given article_id", () => {
+    const article_id = 9;
+    return request(app)
+      .get(`/api/articles/${article_id}/comments`)
+      .expect(200)
+      .then(({ body }) => {
+        expect(body.comments).toBeInstanceOf(Array);
+        expect(body.comments).toHaveLength(2);
+        body.comments.forEach((comment) => {
+          expect(comment).toMatchObject({
+            comment_id: expect.any(Number),
+            votes: expect.any(Number),
+            created_at: expect.any(String),
+            author: expect.any(String),
+            body: expect.any(String),
+          });
+        });
+      });
+  });
+  test("Status 400, invalid ID,", () => {
+    const article_id = "bananas";
+    return request(app)
+      .get(`/api/articles/${article_id}/comments`)
+      .expect(400)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Bad request");
+      });
+  });
+  test("Status 404, non existent ID,", () => {
+    const article_id = 99099999;
+    return request(app)
+      .get(`/api/articles/${article_id}/comments`)
+      .expect(404)
+      .then(({ body }) => {
+        expect(body.msg).toBe("Not found");
+      });
+  });
+});
+describe("POST /api/articles/:article_id/comments", () => {
+  test("Status 201, respond with created comment object", () => {
+    const article_id = 9;
+    const new_comment =
+      "I would love to stand here and talk with you — but I’m not going to.";
+    const username = "butter_bridge";
+
+    return request(app)
+      .post(`/api/articles/${article_id}/comments`)
+      .send({
+        new_comment: new_comment,
+        username: username,
+      })
+      .expect(201)
+      .then(({ body }) => {
+        expect(body.comment).toEqual({
+          comment_id: 19,
+          author: "butter_bridge",
+          article_id: 9,
+          votes: 0,
+          created_at: "2022-01-23T00:00:00.000Z",
+          body: "I would love to stand here and talk with you — but I’m not going to.",
+        });
+      });
+  });
+});
+describe.only("DELETE comments", () => {
+  test("status 204", () => {
+    const comment_id = 19;
+    return request(app).delete(`/api/comments/${comment_id}`).expect(204);
   });
 });
