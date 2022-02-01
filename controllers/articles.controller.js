@@ -8,7 +8,6 @@ const {
   selectArticles,
   selectArticleComments,
   updateArticleComments,
-  removeCommentCommentById,
 } = require("../models/articles.models");
 
 exports.getArticleById = (req, res, next) => {

@@ -388,7 +388,7 @@ describe("POST /api/articles/:article_id/comments", () => {
       });
   });
 });
-describe.only("DELETE comments", () => {
+describe("DELETE comments", () => {
   test("status 204", () => {
     const comment_id = 19;
     return request(app).delete(`/api/comments/${comment_id}`).expect(204);
