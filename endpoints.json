@@ -23,5 +23,22 @@
         }
       ]
     }
+  },
+
+  "GET /api/articles/:article_id": {
+    "description": "serves a single matching article object",
+    "queries": {
+      "exampleResponse": {
+        "articles": {
+          " title": "Eight pug gifs that remind me of mitch",
+          "body": "some gifs",
+          "votes": 0,
+          "topic": "mitch",
+          "author": "icellusedkars",
+          "created_at": "2020-11-03T00:00:00.000Z",
+          "comment_count": "2"
+        }
+      }
+    }
   }
 }

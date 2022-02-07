@@ -1,3 +1,4 @@
+const cors = require("cors");
 const express = require("express");
 const app = express();
 const { getTopics } = require("./controllers/topics.controller");
@@ -15,6 +16,8 @@ const {
   serverErrors,
   handle404s,
 } = require("./errors/errors");
+
+app.use(cors());
 
 app.use(express.json());
 
@@ -34,4 +37,3 @@ app.use(customErrors);
 app.use(serverErrors);
 
 module.exports = app;
-// /Users/gabriella/dev/northcoders/backend/be-nc-news/errors/errors.js
