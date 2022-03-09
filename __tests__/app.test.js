@@ -382,12 +382,13 @@ describe("POST /api/articles/:article_id/comments", () => {
           author: "butter_bridge",
           article_id: 9,
           votes: 0,
-          created_at: "2022-01-23T00:00:00.000Z",
+          created_at: `${new Date("2022-03-09T00:00:00.000Z").toISOString()}`,
           body: "I would love to stand here and talk with you — but I’m not going to.",
         });
       });
   });
 });
+
 describe("DELETE comments", () => {
   test("status 204", () => {
     const comment_id = 19;
