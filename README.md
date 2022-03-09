@@ -61,6 +61,6 @@ DELETE /api/comments/:comment_id: Deletes a comment
 
 **Step 3 - Deployment**
 
-The API is hosted on Heroku here:
+The API is hosted on Heroku here: https://gabriella-nc-news.herokuapp.com/api
 
 For more information on how to deploy and manage your apps on Heroku, their docuemntation is available here: https://devcenter.heroku.com/
