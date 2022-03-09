@@ -16,10 +16,14 @@ const {
   serverErrors,
   handle404s,
 } = require("./errors/errors");
+const endpoints = require("./endpoints.json");
 
 app.use(cors());
 
 app.use(express.json());
+app.get("/api", (req, res, next) => {
+  res.send(endpoints);
+});
 
 app.get("/api/topics", getTopics);
 
